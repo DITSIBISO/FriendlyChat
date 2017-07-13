@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements
         public MessageViewHolder(View v) {
             super(v);
             messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
-            messageImageView = (ImageView) itemView.findViewById(R.id.MessageImageView);
+            messageImageView = (ImageView) itemView.findViewById(R.id.photoImageView);
             messengerTextView = (TextView) itemView.findViewById(R.id.messageTextView);
             messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
         }
@@ -186,8 +186,8 @@ public class MainActivity extends AppCompatActivity implements
             mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
             mLinearLayoutManager = new LinearLayoutManager(this);
             mLinearLayoutManager.setStackFromEnd(true);
-            mMessageListView = (ListView) findViewById(R.id.messageLisView);
-            mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
+           //mMessageListView = (ListView) findViewById(R.id.messageLisView);
+           //mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
             mMessageEditText = (EditText) findViewById(R.id.messageEditText);
             mSendButton = (Button) findViewById(R.id.sendButton);
 
@@ -323,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements
 
             // initialize message ListView and its adapter
             List<FriendlyMessage> friendlyMessages = new ArrayList<>();
-            mMessageAdapter = new MessageAdapter(this, R.layout.activity_item_message, friendlyMessages);
+            mMessageAdapter = new MessageAdapter(this, R.layout.activity_item_message,friendlyMessages);
             mMessageListView.setAdapter(mMessageAdapter);
 
             //initialize progress bar
@@ -336,6 +336,8 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 //TODO: Fire an intent to show an image picker
             });
+
+
 
             // enable send button when there 's text to send
             mMessageEditText = (EditText) findViewById(R.id.messageEditText);
@@ -380,9 +382,8 @@ public class MainActivity extends AppCompatActivity implements
                 @Override
                 public void onClick(View view) {
 
-                    FriendlyMessage friendlyMessage = new
-                            FriendlyMessage(mMessageEditText.getText().toString(),
-                            mUsername, mPhotoUrl, null );
+                    FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText()
+                            .toString(), mUsername, mPhotoUrl);
                     mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
                     mMessageEditText.setText("");
                     mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
@@ -560,7 +561,7 @@ public class MainActivity extends AppCompatActivity implements
                     final Uri uri = data.getData();
                     Log.d(TAG, "Uri: " + uri.toString());
 
-                    FriendlyMessage tempMessage = new FriendlyMessage(null, mUsername, mPhotoUrl,
+                    FriendlyMessage tempMessage = new FriendlyMessage(mUsername, mPhotoUrl,
                             LOADING_IMAGE_URL);
                     mFirebaseDatabaseReference.child(MESSAGES_CHILD).push()
                             .setValue(tempMessage, new DatabaseReference.CompletionListener() {
@@ -611,10 +612,9 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()) {
-                            FriendlyMessage friendlyMessage =
-                                    new FriendlyMessage(null, mUsername, mPhotoUrl,
-                                            task.getResult().getDownloadUrl()
-                                                    .toString());
+                            FriendlyMessage friendlyMessage = new FriendlyMessage
+                                    (mUsername, mPhotoUrl,task.getResult().getDownloadUrl()
+                                            .toString());
                             mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(key)
                                     .setValue(friendlyMessage);
                         } else {
